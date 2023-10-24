@@ -18,6 +18,7 @@ def generate_response_with_gradio(prompt, max_tokens=50):
     return response
 
 iface = gr.Interface(
+    flagging_dir="/tmp/flagged",
     fn=generate_response_with_gradio,
     inputs="text",
     outputs="text",
