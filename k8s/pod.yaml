@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openshift-ai-pod
+  labels:
+    app: openshift-ai
+  namespace: ai-project  
+spec:
+  containers:
+  - name: openshift-ai-container
+    image: twinkllsisodia/openshift-ai-chatbot:latest
+    env:
+      - name: OPENAI_KEY
+        valueFrom:
+          secretKeyRef:
+            name: openai-secret
+            key: OPENAI_KEY
+    ports:
+    - containerPort: 7860 
