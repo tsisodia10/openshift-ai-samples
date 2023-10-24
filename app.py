@@ -1,8 +1,9 @@
 import openai
 import gradio as gr
+import os
 
 # Set your OpenAI API key
-openai.api_key = ''
+openai.api_key = os.environ.get("OPENAI_KEY")
 
 def generate_response(prompt, max_tokens=50):
     response = openai.Completion.create(
@@ -20,7 +21,7 @@ iface = gr.Interface(
     fn=generate_response_with_gradio,
     inputs="text",
     outputs="text",
-    layout="vertical",
+    layout="horizontal",
     title="Few-Shot Prompting",
     description="Enter a text prompt.",
     capture_session=True
