@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 import redis
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 @app.route('/store_rating', methods=['POST'])
