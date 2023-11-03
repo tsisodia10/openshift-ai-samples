@@ -3,12 +3,12 @@ kind: Pod
 metadata:
   name: openshift-ai-pod
   labels:
-    app: openshift-ai
-  namespace: ai-project  
+    app: frontend
+  namespace: prometheus 
 spec:
   containers:
   - name: openshift-ai-container
-    image: twinkllsisodia/openshift-ai-chatbot:latest
+    image: twinkllsisodia/ai-chatbot:latest
     env:
       - name: OPENAI_KEY
         valueFrom:

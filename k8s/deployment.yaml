@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ai
+    version: v1
+  name: ai-chatbot
+  namespace: chatbot
+spec:
+  selector:
+    matchLabels:
+      app: ai
+      version: v1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ai
+        version: v1
+    spec:
+      serviceAccountName: chatbot-sa
+      containers:
+        - image: twinkllsisodia/ai-chatbot:latest
+          name: ai
+          env:
+          - name: OPENAI_KEY
+            valueFrom:
+              secretKeyRef:
+                name: openai-secret
+                key: OPENAI_KEY
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 7860
+              name: http
+          imagePullPolicy: Always
+      restartPolicy: Always         

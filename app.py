@@ -13,18 +13,25 @@ start_http_server(8000)  # Exposes metrics at http://localhost:8000
 REQUESTS = Counter('generate_response_total', 'Total number of generate_response calls')
 MEMORY_USAGE = Gauge('application_memory_usage_bytes', 'Memory usage of the application')
 CPU_USAGE = Gauge('application_cpu_usage_seconds_total', 'Total CPU time used by the application')
+RESPONSE_TIME = Histogram('generate_response_duration_seconds', 'Histogram for the response time of generate_response')
+ERRORS = Counter('generate_response_errors_total', 'Total number of errors in generate_response')
 
 # Set your OpenAI API key
 openai.api_key = os.environ.get("OPENAI_KEY")
 
 def generate_response(prompt, max_tokens=50):
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=max_tokens
-    )
-    REQUESTS.inc()  # Increment request count
-    return response.choices[0].text
+    with RESPONSE_TIME.time():  # Measure response time
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt,
+                max_tokens=max_tokens
+            )
+            REQUESTS.inc()  # Increment request count
+            return response.choices[0].text
+        except Exception as e:
+            ERRORS.inc()  # Increment error count
+            raise e 
 
 def generate_response_with_gradio(prompt, max_tokens=50):
     response = generate_response(prompt, max_tokens)
@@ -53,4 +60,3 @@ metrics_thread.start()
 
 if __name__ == '__main__':
     iface.launch()
-
