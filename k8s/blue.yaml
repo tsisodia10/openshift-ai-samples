@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: blue
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: blue
+    version: v1
+  name: blue
+  namespace: blue
+spec:
+  ports:
+    - port: 9000
+      name: http
+      nodePort: 32002
+  selector:
+    app: blue
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: blue
+    version: v1
+  name: blue
+  namespace: blue
+spec:
+  selector:
+    matchLabels:
+      app: blue
+      version: v1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: blue
+        version: v1
+    spec:
+      serviceAccountName: blue
+      containers:
+        - image: docker.io/cmwylie19/go-metrics-ex
+          name: blue
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            successThreshold: 1
+            periodSeconds: 10
+            httpGet:
+              path: /
+              port: 9000
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            httpGet:
+              path: /
+              port: 9000
+          ports:
+            - containerPort: 9000
+              name: http
+          imagePullPolicy: Always
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: blue
+  namespace: blue
